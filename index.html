@@ -8,26 +8,41 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="top">
-    <div class="brand">
-      <span class="logo">CHV</span>
-      <div>
-        <h1>Tablero EN CURSO</h1>
-        <p class="sub">Asuntos y tareas · lectura escritorio y celular</p>
+  <div id="gate" class="gate">
+    <form id="login" class="login" autocomplete="on">
+      <div class="logo">CHV</div>
+      <h1>Tablero EN CURSO</h1>
+      <p>Ingreso interno</p>
+      <label>Usuario
+        <input id="user" name="username" type="text" required autocomplete="username" />
+      </label>
+      <label>Clave
+        <input id="pass" name="password" type="password" required autocomplete="current-password" />
+      </label>
+      <button type="submit">Entrar</button>
+      <p id="err" class="err" hidden>Usuario o clave incorrectos</p>
+    </form>
+  </div>
+
+  <div id="app" hidden>
+    <header class="top">
+      <div class="brand">
+        <span class="logo">CHV</span>
+        <div>
+          <h1>Tablero EN CURSO</h1>
+          <p class="sub">Asuntos y tareas · escritorio y celular</p>
+        </div>
       </div>
-    </div>
-    <div class="stats" id="stats"></div>
-  </header>
-
-  <section class="filters" id="filters">
-    <input id="q" type="search" placeholder="Buscar asunto, código o tarea…" autocomplete="off" />
-    <select id="casillero"><option value="">Todos los casilleros</option></select>
-    <select id="estado"><option value="">Todos los estados</option></select>
-  </section>
-
-  <main id="list" class="list"></main>
-  <p class="foot">Maestro: planilla Google · v8 · lectura del índice. Uso interno CHV.</p>
-  <script src="data.js"></script>
+      <div class="stats" id="stats"></div>
+    </header>
+    <section class="filters">
+      <input id="q" type="search" placeholder="Buscar asunto, código o tarea…" autocomplete="off" />
+      <select id="casillero"><option value="">Todos los casilleros</option></select>
+      <select id="estado"><option value="">Todos los estados</option></select>
+    </section>
+    <main id="list" class="list"></main>
+    <p class="foot"><button type="button" id="salir">Cerrar sesión</button></p>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
