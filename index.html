@@ -40,8 +40,18 @@
       <select id="casillero"><option value="">Todos los casilleros</option></select>
       <select id="estado"><option value="">Todos los estados</option></select>
     </section>
+    <section class="actions">
+      <button type="button" id="btnAsunto">+ Asunto</button>
+      <button type="button" id="btnTarea">+ Tarea</button>
+      <button type="button" id="btnCas">Casilleros</button>
+      <button type="button" id="btnExp" class="ghost">Exportar</button>
+    </section>
     <main id="list" class="list"></main>
     <p class="foot"><button type="button" id="salir">Cerrar sesión</button></p>
+  </div>
+
+  <div id="modal" class="modal" hidden>
+    <div class="sheet" id="sheet"></div>
   </div>
   <script src="app.js"></script>
 </body>
