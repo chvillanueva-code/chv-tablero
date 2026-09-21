@@ -3,6 +3,7 @@
   const STORE = "chv_tablero_data";
   const USER = "chv";
   const PASS = "210078";
+  const CFG = window.CHV_CONFIG || {};
   const EST_A = ["Abierto", "Abierto — aclarar", "Pendiente aclarar", "Casi cerrado", "Hecha"];
   const EST_T = ["Pendiente", "Bloqueada", "Hecha"];
 
@@ -12,6 +13,47 @@
   const err = document.getElementById("err");
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
+
+  function sheetsUrl() { return String(CFG.WEBAPP_URL || "").trim(); }
+  function setOrigen(t) {
+    const el = document.getElementById("origen");
+    if (el) el.textContent = t;
+  }
+  function persistLocal() {
+    localStorage.setItem(STORE, JSON.stringify(DATA));
+  }
+  function persist(extra) {
+    persistLocal();
+    if (!sheetsUrl()) return;
+    const payload = Object.assign({ token: CFG.TOKEN || PASS }, extra || { replaceAll: DATA });
+    fetch(sheetsUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    }).then(function () { setOrigen("Guardado en Google Sheets"); })
+      .catch(function () { setOrigen("No se pudo escribir en Sheets — queda en este aparato"); });
+  }
+  function pullSheets() {
+    const url = sheetsUrl();
+    if (!url) return Promise.resolve(false);
+    setOrigen("Leyendo Google Sheets…");
+    return fetch(url + "?token=" + encodeURIComponent(CFG.TOKEN || PASS))
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        if (json && json.ok && json.data) {
+          window.DATA = json.data;
+          persistLocal();
+          setOrigen("Conectado a Google Sheets");
+          return true;
+        }
+        setOrigen("Sheets no respondió — usando copia local");
+        return false;
+      })
+      .catch(function () {
+        setOrigen("Sin conexión a Sheets — copia local");
+        return false;
+      });
+  }
 
   function showApp() {
     gate.hidden = true;
@@ -46,11 +88,7 @@
       const saved = JSON.parse(localStorage.getItem(STORE) || "");
       if (saved && saved.asuntos) window.DATA = saved;
     } catch (e) {}
-    start();
-  }
-
-  function persist() {
-    localStorage.setItem(STORE, JSON.stringify(DATA));
+    pullSheets().then(function () { start(); });
   }
 
   function nextAsunto() {
@@ -122,7 +160,7 @@
       const i = DATA.asuntos.findIndex(function (x) { return x.id === row.id; });
       if (i >= 0) DATA.asuntos[i] = Object.assign({}, DATA.asuntos[i], row);
       else DATA.asuntos.push(row);
-      persist(); closeModal(); start();
+      persist({ asunto: row }); closeModal(); start();
     };
   }
 
@@ -156,7 +194,7 @@
       const i = DATA.tareas.findIndex(function (x) { return x.id === row.id; });
       if (i >= 0) DATA.tareas[i] = row;
       else DATA.tareas.push(row);
-      persist(); closeModal(); start();
+      persist({ tarea: row }); closeModal(); start();
     };
   }
 
@@ -188,11 +226,9 @@
       });
       const neu = (e.target.nuevo.value || "").trim();
       if (neu) {
-        DATA.casilleros.push({
-          codigo: neu, nombre: neu, descripcion: "", orden: DATA.casilleros.length + 1, activo: true
-        });
+        DATA.casilleros.push({ codigo: neu, nombre: neu, descripcion: "", orden: DATA.casilleros.length + 1, activo: true });
       }
-      persist(); closeModal(); start();
+      persist({ replaceAll: DATA }); closeModal(); start();
     };
   }
 
@@ -277,6 +313,9 @@
     $("btnTarea").onclick = function () { formTarea(null); };
     $("btnCas").onclick = formCas;
     $("btnExp").onclick = exportar;
+    if ($("btnSync")) $("btnSync").onclick = function () {
+      pullSheets().then(function () { start(); });
+    };
     render();
   }
 })();
