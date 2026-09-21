@@ -15,7 +15,7 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
   padding: 24px; background: var(--blue);
 }
-.gate[hidden], #app[hidden] { display: none !important; }
+.gate[hidden], #app[hidden], .modal[hidden] { display: none !important; }
 .login {
   width: 100%; max-width: 360px; background: #fff; border-radius: 14px;
   padding: 24px; display: grid; gap: 10px;
@@ -26,11 +26,11 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
 }
 .login h1 { margin: 0; font-size: 1.15rem; }
 .login p { margin: 0; color: var(--muted); font-size: .9rem; }
-.login label { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); }
-.login input {
-  padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1rem;
+.login label, .sheet label { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); }
+.login input, .sheet input, .sheet select, .sheet textarea {
+  padding: 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1rem; width: 100%;
 }
-.login button, #salir {
+.login button, #salir, .actions button, .sheet button {
   margin-top: 6px; padding: 12px; border: 0; border-radius: 8px;
   background: var(--blue); color: #fff; font-size: 1rem; cursor: pointer;
 }
@@ -40,10 +40,7 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
   display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
 }
 .brand { display: flex; gap: 12px; align-items: center; }
-.logo {
-  background: #fff; color: var(--blue); font-weight: 700;
-  padding: 8px 10px; border-radius: 6px;
-}
+.logo { background: #fff; color: var(--blue); font-weight: 700; padding: 8px 10px; border-radius: 6px; }
 h1 { margin: 0; font-size: 1.1rem; }
 .sub { margin: 2px 0 0; font-size: .8rem; opacity: .85; }
 .stats { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -55,6 +52,15 @@ h1 { margin: 0; font-size: 1.1rem; }
 .filters input, .filters select {
   width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 1rem;
 }
+.actions {
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px;
+}
+.actions button { margin: 0; padding: 10px 12px; font-size: .9rem; }
+button.ghost {
+  background: #fff; color: var(--blue); border: 1px solid var(--line);
+}
+.mini { display: flex; gap: 8px; padding: 8px 2px 0; }
+.mini button { margin: 0; padding: 8px 10px; font-size: .8rem; }
 .list { padding: 12px 16px 40px; display: flex; flex-direction: column; gap: 10px; }
 .asunto { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .asunto-head {
@@ -79,7 +85,23 @@ h1 { margin: 0; font-size: 1.1rem; }
 .cond { font-size: .78rem; color: var(--muted); margin-top: 4px; }
 .foot { text-align: center; padding: 0 16px 24px; }
 #salir { background: transparent; color: var(--blue); border: 1px solid var(--line); }
+.modal {
+  position: fixed; inset: 0; background: rgba(15,30,45,.45);
+  display: flex; align-items: flex-end; justify-content: center; z-index: 20; padding: 12px;
+}
+.sheet {
+  background: #fff; width: 100%; max-width: 520px; max-height: 88vh; overflow: auto;
+  border-radius: 16px 16px 8px 8px; padding: 16px; display: grid; gap: 10px;
+}
+.sheet h3 { margin: 0; }
+.sheet form { display: grid; gap: 10px; }
+.rowbtns { display: flex; gap: 8px; }
+.rowbtns button { flex: 1; }
+.casrow { display: grid; grid-template-columns: 1fr 70px auto; gap: 8px; align-items: center; }
+.chk { display: flex; align-items: center; gap: 6px; font-size: .8rem; }
 @media (min-width: 720px) {
-  .filters { grid-template-columns: 2fr 1fr 1fr; max-width: 980px; margin: 0 auto; width: 100%; }
-  .list, .foot { max-width: 980px; margin-left: auto; margin-right: auto; }
+  .filters, .actions, .list, .foot { max-width: 980px; margin-left: auto; margin-right: auto; width: 100%; }
+  .filters { grid-template-columns: 2fr 1fr 1fr; }
+  .modal { align-items: center; }
+  .sheet { border-radius: 16px; }
 }
