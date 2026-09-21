@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>CHV — Tablero EN CURSO</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">CHV</span>
+      <div>
+        <h1>Tablero EN CURSO</h1>
+        <p class="sub">Asuntos y tareas · lectura escritorio y celular</p>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section class="filters" id="filters">
+    <input id="q" type="search" placeholder="Buscar asunto, código o tarea…" autocomplete="off" />
+    <select id="casillero"><option value="">Todos los casilleros</option></select>
+    <select id="estado"><option value="">Todos los estados</option></select>
+  </section>
+
+  <main id="list" class="list"></main>
+  <p class="foot">Maestro: planilla Google · v8 · lectura del índice. Uso interno CHV.</p>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
