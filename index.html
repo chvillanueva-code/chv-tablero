@@ -30,7 +30,7 @@
         <span class="logo">CHV</span>
         <div>
           <h1>Tablero EN CURSO</h1>
-          <p class="sub">Asuntos y tareas · escritorio y celular</p>
+          <p class="sub" id="origen">Asuntos y tareas · escritorio y celular</p>
         </div>
       </div>
       <div class="stats" id="stats"></div>
@@ -44,6 +44,7 @@
       <button type="button" id="btnAsunto">+ Asunto</button>
       <button type="button" id="btnTarea">+ Tarea</button>
       <button type="button" id="btnCas">Casilleros</button>
+      <button type="button" id="btnSync" class="ghost">Sincronizar Sheets</button>
       <button type="button" id="btnExp" class="ghost">Exportar</button>
     </section>
     <main id="list" class="list"></main>
@@ -53,6 +54,7 @@
   <div id="modal" class="modal" hidden>
     <div class="sheet" id="sheet"></div>
   </div>
+  <script src="config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
