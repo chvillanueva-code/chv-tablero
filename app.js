@@ -14,6 +14,7 @@
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
   function emptyData() { return { casilleros: [], asuntos: [], tareas: [] }; }
+  let DATA = emptyData();
   function defaultBoards() {
     return {
       current: "cabeza",
@@ -41,7 +42,7 @@
   }
   function saveBoards() {
     try {
-      if (window.DATA) BOARDS.data[BOARDS.current] = DATA;
+      if (DATA) BOARDS.data[BOARDS.current] = DATA;
       localStorage.setItem(BSTORE, JSON.stringify(BOARDS));
     } catch (e) {}
   }
@@ -76,15 +77,11 @@
   function switchBoard(id) {
     saveBoards();
     BOARDS.current = id;
-    window.DATA = emptyData();
-    try {
-      const loc = JSON.parse(localStorage.getItem(STORE + "_" + id) || "");
-      if (loc && loc.asuntos) window.DATA = loc;
-    } catch (e) {}
+    DATA = emptyData();
     saveBoards();
     paintBoard();
     start();
-    pullSheets().then(function () { paintBoard(); start(); });
+    pullSheets().then(function () { start(); });
   }
   function formBoard(isNew) {
     const b = isNew ? { nombre: "", descripcion: "" } : board();
@@ -114,10 +111,6 @@
     };
   }
   function sheetsUrl() { return String(CFG.WEBAPP_URL || "").trim(); }
-  function setOrigen(t) {
-    const el = document.getElementById("origen");
-    if (el) el.title = t || "";
-  }
   function persistLocal() {
     try {
       localStorage.setItem(STORE + "_" + BOARDS.current, JSON.stringify(DATA));
@@ -145,7 +138,7 @@
           });
         }
         if (json && json.ok && json.data) {
-          window.DATA = json.data;
+          DATA = json.data;
           persistLocal();
           return true;
         }
@@ -153,27 +146,19 @@
       })
       .catch(function () { return false; });
   }
-  function showApp() { gate.hidden = true; app.hidden = false; loadData(); }
-  function loadData() {
-    const s = document.createElement("script");
-    s.src = "data.js?v=31";
-    s.onload = boot;
-    s.onerror = boot;
-    document.body.appendChild(s);
-  }
+  function showApp() { gate.hidden = true; app.hidden = false; boot(); }
   function boot() {
+    DATA = emptyData();
     try {
-      const saved = JSON.parse(localStorage.getItem(STORE + "_" + BOARDS.current) || localStorage.getItem(STORE) || "");
-      if (BOARDS.current === "cabeza" && saved && saved.asuntos) window.DATA = saved;
+      if (BOARDS.current === "cabeza") {
+        const saved = JSON.parse(localStorage.getItem(STORE + "_cabeza") || localStorage.getItem(STORE) || "");
+        if (saved && saved.asuntos) DATA = saved;
+      }
     } catch (e) {}
-    if (!window.DATA || BOARDS.current !== "cabeza") {
-      if (BOARDS.current !== "cabeza") window.DATA = emptyData();
-      else if (!window.DATA) window.DATA = emptyData();
-    }
     paintBoard();
     bindBoardUi();
     start();
-    pullSheets().then(function () { paintBoard(); start(); });
+    pullSheets().then(function () { start(); });
   }
   function bindBoardUi() {
     const ed = document.getElementById("btnEditBoard");
@@ -236,9 +221,7 @@
     modal.onclick = function (e) { if (e.target === modal) closeModal(); };
   }
   function opts(list, val) {
-    return list.map(function (v) {
-      return "<option" + (v === val ? " selected" : "") + ">" + v + "</option>";
-    }).join("");
+    return list.map(function (v) { return "<option" + (v === val ? " selected" : "") + ">" + v + "</option>"; }).join("");
   }
   function casOpts(val) {
     return (DATA.casilleros || []).filter(function (c) { return c.activo; }).sort(function (a, b) { return a.orden - b.orden; })
@@ -304,7 +287,7 @@
     const $ = function (id) { return document.getElementById(id); };
     const list = $("list"), q = $("q"), cas = $("casillero"), est = $("estado");
     if (!list) return;
-    if (!DATA || !DATA.asuntos) window.DATA = emptyData();
+    if (!DATA || !DATA.asuntos) DATA = emptyData();
     if (!DATA.tareas) DATA.tareas = [];
     if (!DATA.casilleros) DATA.casilleros = [];
     const keepC = cas.value, keepE = est.value, keepQ = q.value;
