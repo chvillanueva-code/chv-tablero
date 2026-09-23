@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow" />
   <title>CHV — Ingreso interno</title>
-  <link rel="stylesheet" href="styles.css?v=36" />
-  <link rel="stylesheet" href="logo.css?v=36" />
+  <link rel="stylesheet" href="styles.css?v=37" />
+  <link rel="stylesheet" href="logo.css?v=37" />
 </head>
 <body>
   <div id="gate" class="gate">
@@ -66,7 +66,6 @@
   <script>
     (function () {
       var KEY = "chv_tablero_ok";
-      var USER = "chv";
       var PASS = "250578";
       var gate = document.getElementById("gate");
       var app = document.getElementById("app");
@@ -77,15 +76,16 @@
         e.preventDefault();
         var u = (document.getElementById("user").value || "").trim().toLowerCase();
         var p = String(document.getElementById("pass").value || "").trim();
-        if (u === USER && p === PASS) { err.hidden = true; sessionStorage.setItem(KEY, "1"); openApp(); }
+        var ok = (u === "chv" || u === "mlv") && p === PASS;
+        if (ok) { err.hidden = true; sessionStorage.setItem(KEY, "1"); sessionStorage.setItem("chv_user", u.toUpperCase()); openApp(); }
         else err.hidden = false;
       });
       document.getElementById("salir").addEventListener("click", function () {
-        sessionStorage.removeItem(KEY); location.reload();
+        sessionStorage.removeItem(KEY); sessionStorage.removeItem("chv_user"); location.reload();
       });
     })();
   </script>
-  <script src="config.js?v=36"></script>
-  <script src="app.js?v=36"></script>
+  <script src="config.js?v=37"></script>
+  <script src="app.js?v=37"></script>
 </body>
 </html>
