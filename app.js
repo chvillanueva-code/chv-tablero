@@ -15,7 +15,7 @@
   function sheetsUrl() { return String(CFG.WEBAPP_URL || "").trim(); }
   function setOrigen(t) {
     const el = document.getElementById("origen");
-    if (el) el.textContent = t;
+    if (el) el.title = t || "";
   }
   function persistLocal() {
     try { localStorage.setItem(STORE, JSON.stringify(DATA)); } catch (e) {}
