@@ -4,24 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow" />
-  <title>CHV — Tablero: CABEZA</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="logo.css" />
+  <title>CHV — Ingreso interno</title>
+  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="logo.css?v=23" />
 </head>
 <body>
   <div id="gate" class="gate">
-    <form id="login" class="login" autocomplete="on">
+    <form id="login" class="login" autocomplete="off">
       <div class="login-logo" role="img" aria-label="CHV / Decisiones inmobiliarias"></div>
-      <h1>Tablero: CABEZA</h1>
-      <p>Ingreso interno</p>
+      <h1>Ingreso interno</h1>
+      <p>Usuario y clave de oficina</p>
       <label>Usuario
-        <input id="user" name="username" type="text" required value="CHV" autocomplete="username" />
+        <input id="user" name="username" type="text" required value="" placeholder="" autocomplete="off" />
       </label>
       <label>Clave
-        <input id="pass" name="password" type="password" required autocomplete="current-password" />
+        <input id="pass" name="password" type="password" required value="" placeholder="" autocomplete="off" />
       </label>
       <button type="submit">Entrar</button>
-      <p id="err" class="err" hidden>Usuario o clave incorrectos. Clave: 250578</p>
+      <p id="err" class="err" hidden>Usuario o clave incorrectos.</p>
     </form>
   </div>
 
@@ -55,7 +55,40 @@
   <div id="modal" class="modal" hidden>
     <div class="sheet" id="sheet"></div>
   </div>
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+
+  <script>
+    (function () {
+      var KEY = "chv_tablero_ok";
+      var USER = "chv";
+      var PASS = "250578";
+      var gate = document.getElementById("gate");
+      var app = document.getElementById("app");
+      var err = document.getElementById("err");
+      function openApp() {
+        gate.hidden = true;
+        app.hidden = false;
+        document.title = "CHV — Tablero: CABEZA";
+      }
+      if (sessionStorage.getItem(KEY) === "1") openApp();
+      document.getElementById("login").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var u = (document.getElementById("user").value || "").trim().toLowerCase();
+        var p = String(document.getElementById("pass").value || "").trim();
+        if (u === USER && p === PASS) {
+          err.hidden = true;
+          sessionStorage.setItem(KEY, "1");
+          openApp();
+        } else {
+          err.hidden = false;
+        }
+      });
+      document.getElementById("salir").addEventListener("click", function () {
+        sessionStorage.removeItem(KEY);
+        location.reload();
+      });
+    })();
+  </script>
+  <script src="config.js?v=23"></script>
+  <script src="app.js?v=23"></script>
 </body>
 </html>
