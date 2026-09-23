@@ -178,8 +178,10 @@ button.ghost { background: #fff; color: var(--blue); border: 1px solid var(--lin
 .asunto { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
 .asunto-head {
   width: 100%; text-align: left; background: none; border: 0;
-  padding: 12px 14px; display: grid; gap: 6px; cursor: pointer;
+  padding: 10px 12px; cursor: pointer;
 }
+.asunto-main { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.asunto-main .title, .asunto-main .cas, .asunto-main .meta { margin: 0; }
 .row1 { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
 .id { font-weight: 700; color: var(--blue); font-size: .92rem; }
 .cas { font-size: .72rem; color: var(--muted); text-transform: uppercase; }
