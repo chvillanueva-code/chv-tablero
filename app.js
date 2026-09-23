@@ -48,6 +48,12 @@
       localStorage.setItem(BSTORE, JSON.stringify(BOARDS));
     } catch (e) {}
   }
+  function closeBoardMenu() {
+    const menu = document.getElementById("boardMenu");
+    const btn = document.getElementById("boardBtn");
+    if (menu) menu.hidden = true;
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  }
   function paintBoard() {
     const b = board();
     const h = document.getElementById("boardName");
@@ -55,11 +61,19 @@
     if (h) h.textContent = "Tablero: " + b.nombre;
     if (d) d.textContent = b.descripcion;
     document.title = "CHV — Tablero: " + b.nombre;
-    const pick = document.getElementById("boardPick");
-    if (pick) {
-      pick.innerHTML = BOARDS.list.map(function (x) {
-        return "<option value=\"" + x.id + "\"" + (x.id === BOARDS.current ? " selected" : "") + ">" + x.nombre + "</option>";
+    const menu = document.getElementById("boardMenu");
+    if (menu) {
+      menu.innerHTML = BOARDS.list.map(function (x) {
+        return '<button type="button" class="board-opt' + (x.id === BOARDS.current ? " on" : "") + '" data-id="' + x.id + '"><strong>Tablero: ' + x.nombre + "</strong><span>" + (x.descripcion || "") + "</span></button>";
       }).join("");
+      menu.querySelectorAll(".board-opt").forEach(function (opt) {
+        opt.onclick = function (e) {
+          e.stopPropagation();
+          const id = opt.getAttribute("data-id");
+          closeBoardMenu();
+          if (id !== BOARDS.current) switchBoard(id);
+        };
+      });
     }
   }
   function switchBoard(id) {
@@ -190,10 +204,22 @@
   function bindBoardUi() {
     const ed = document.getElementById("btnEditBoard");
     const nw = document.getElementById("btnNewBoard");
-    const pk = document.getElementById("boardPick");
+    const btn = document.getElementById("boardBtn");
     if (ed) ed.onclick = function () { formBoard(false); };
     if (nw) nw.onclick = function () { formBoard(true); };
-    if (pk) pk.onchange = function () { switchBoard(pk.value); };
+    if (btn && !btn.getAttribute("data-bound")) {
+      btn.setAttribute("data-bound", "1");
+      btn.onclick = function (e) {
+        e.stopPropagation();
+        const menu = document.getElementById("boardMenu");
+        if (!menu) return;
+        const willOpen = menu.hidden;
+        menu.hidden = !willOpen;
+        btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+      };
+      document.addEventListener("click", function () { closeBoardMenu(); });
+    }
+    paintBoard();
   }
   function nextAsunto() {
     const n = DATA.asuntos.reduce(function (m, a) {
