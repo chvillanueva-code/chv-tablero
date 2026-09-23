@@ -53,13 +53,13 @@
     const b = board();
     const h = document.getElementById("boardName");
     const d = document.getElementById("origen");
-    if (h) h.textContent = "Tablero: " + b.nombre;
+    if (h) h.textContent = b.nombre;
     if (d) d.textContent = b.descripcion;
     document.title = "CHV — Tablero: " + b.nombre;
     const menu = document.getElementById("boardMenu");
     if (menu) {
       menu.innerHTML = BOARDS.list.map(function (x) {
-        return '<button type="button" class="board-opt' + (x.id === BOARDS.current ? " on" : "") + '" data-id="' + x.id + '"><strong>Tablero: ' + x.nombre + "</strong><span>" + (x.descripcion || "") + "</span></button>";
+        return '<button type="button" class="board-opt' + (x.id === BOARDS.current ? " on" : "") + '" data-id="' + x.id + '"><strong>' + x.nombre + "</strong><span>" + (x.descripcion || "") + "</span></button>";
       }).join("");
       menu.querySelectorAll(".board-opt").forEach(function (opt) {
         opt.onclick = function (e) {
