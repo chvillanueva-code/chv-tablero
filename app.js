@@ -2,9 +2,10 @@
   const KEY = "chv_tablero_ok";
   const STORE = "chv_tablero_data";
   const BSTORE = "chv_tableros";
-  const USER = "chv";
   const PASS = "250578";
   const CFG = window.CHV_CONFIG || {};
+  const USERS = (CFG.USERS || [{usuario:"CHV",clave:"250578"}]);
+  let CUR_USER = (sessionStorage.getItem("chv_user") || "CHV").toUpperCase();
   const EST_A = ["Abierto", "Abierto — aclarar", "Pendiente aclarar", "Casi cerrado", "Hecha"];
   const EST_T = ["Pendiente", "Bloqueada", "Hecha"];
   const gate = document.getElementById("gate");
@@ -27,14 +28,10 @@
   }
   let BOARDS = defaultBoards();
   try {
-    const savedB = JSON.parse(localStorage.getItem(BSTORE) || "");
+    const savedB = JSON.parse(localStorage.getItem(BSTORE + "_" + CUR_USER) || localStorage.getItem(BSTORE) || "");
     if (savedB && savedB.list) {
       BOARDS = savedB;
-      if (!BOARDS.list.some(function (b) { return b.id === "hogar"; })) {
-        BOARDS.list.push({ id: "hogar", nombre: "HOGAR", descripcion: "Home Sweet Home" });
-      }
       BOARDS.data = BOARDS.data || {};
-      if (!BOARDS.data.hogar) BOARDS.data.hogar = emptyData();
     }
   } catch (e) {}
   function board() {
@@ -43,7 +40,7 @@
   function saveBoards() {
     try {
       if (DATA) BOARDS.data[BOARDS.current] = DATA;
-      localStorage.setItem(BSTORE, JSON.stringify(BOARDS));
+      localStorage.setItem(BSTORE + "_" + CUR_USER, JSON.stringify(BOARDS));
     } catch (e) {}
   }
   function closeBoardMenu() {
@@ -113,7 +110,7 @@
   function sheetsUrl() { return String(CFG.WEBAPP_URL || "").trim(); }
   function persistLocal() {
     try {
-      localStorage.setItem(STORE + "_" + BOARDS.current, JSON.stringify(DATA));
+      localStorage.setItem(STORE + "_" + CUR_USER + "_" + BOARDS.current, JSON.stringify(DATA));
       saveBoards();
     } catch (e) {}
   }
@@ -123,13 +120,13 @@
     fetch(sheetsUrl(), {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(Object.assign({ token: CFG.TOKEN || PASS, boardId: BOARDS.current }, extra || { replaceAll: DATA }))
+      body: JSON.stringify(Object.assign({ token: CFG.TOKEN || PASS, boardId: BOARDS.current, user: CUR_USER }, extra || { replaceAll: DATA }))
     }).catch(function () {});
   }
   function pullSheets() {
     const url = sheetsUrl();
     if (!url) return Promise.resolve(false);
-    return fetch(url + "?token=" + encodeURIComponent(CFG.TOKEN || PASS) + "&board=" + encodeURIComponent(BOARDS.current))
+    return fetch(url + "?token=" + encodeURIComponent(CFG.TOKEN || PASS) + "&board=" + encodeURIComponent(BOARDS.current) + "&user=" + encodeURIComponent(CUR_USER))
       .then(function (r) { return r.json(); })
       .then(function (json) {
         if (json && json.ok && json.boards && json.boards.length) {
@@ -149,12 +146,6 @@
   function showApp() { gate.hidden = true; app.hidden = false; boot(); }
   function boot() {
     DATA = emptyData();
-    try {
-      if (BOARDS.current === "cabeza") {
-        const saved = JSON.parse(localStorage.getItem(STORE + "_cabeza") || localStorage.getItem(STORE) || "");
-        if (saved && saved.asuntos) DATA = saved;
-      }
-    } catch (e) {}
     paintBoard();
     bindBoardUi();
     start();
@@ -187,14 +178,18 @@
     e.preventDefault();
     const u = (document.getElementById("user").value || "").trim().toLowerCase();
     const p = document.getElementById("pass").value || "";
-    if (u === USER && p === PASS) {
+    var hit = USERS.filter(function (x) { return String(x.usuario).toLowerCase() === u && String(x.clave) === p; })[0];
+    if (hit) {
       err.hidden = true;
+      CUR_USER = String(hit.usuario).toUpperCase();
       sessionStorage.setItem(KEY, "1");
+      sessionStorage.setItem("chv_user", CUR_USER);
       showApp();
     } else err.hidden = false;
   });
   document.getElementById("salir").addEventListener("click", function () {
     sessionStorage.removeItem(KEY);
+    sessionStorage.removeItem("chv_user");
     location.reload();
   });
   function boardPrefix() {
@@ -243,7 +238,7 @@
     openModal("<h3>" + ((DATA.asuntos || []).some(function (x) { return x.id === a.id; }) ? "Editar" : "Nuevo") + " asunto</h3><form id=\"fA\"><label>Código<input name=\"id\" value=\"" + a.id + "\" readonly></label><label>Casillero<select name=\"casillero\">" + casOpts(a.casillero) + "</select></label><label>Asunto<input name=\"asunto\" required value=\"" + (a.asunto || "") + "\"></label><label>Estado<select name=\"estado\">" + opts(EST_A, a.estado) + "</select></label><label>Dueño<input name=\"dueno\" value=\"" + (a.dueno || "") + "\"></label><label>Próximo<input name=\"proximo\" value=\"" + (a.proximo || "") + "\"></label><label>Notas<textarea name=\"notas\">" + (a.notas || "") + "</textarea></label><div class=\"rowbtns\"><button type=\"submit\">Guardar</button><button type=\"button\" data-close class=\"ghost\">Cancelar</button></div></form>");
     document.getElementById("fA").onsubmit = function (e) {
       e.preventDefault(); const fd = new FormData(e.target);
-      const row = { id: fd.get("id"), casillero: fd.get("casillero"), asunto: fd.get("asunto"), estado: fd.get("estado"), dueno: fd.get("dueno"), proximo: fd.get("proximo"), notas: fd.get("notas"), carpeta: a.carpeta || "", link: a.link || "", cuenta: a.cuenta || "oficina", tablero: BOARDS.current };
+      const row = { id: fd.get("id"), casillero: fd.get("casillero"), asunto: fd.get("asunto"), estado: fd.get("estado"), dueno: fd.get("dueno"), proximo: fd.get("proximo"), notas: fd.get("notas"), carpeta: a.carpeta || "", link: a.link || "", cuenta: a.cuenta || "oficina", tablero: BOARDS.current, usuario: CUR_USER };
       const i = DATA.asuntos.findIndex(function (x) { return x.id === row.id; });
       if (i >= 0) DATA.asuntos[i] = Object.assign({}, DATA.asuntos[i], row); else DATA.asuntos.push(row);
       persist({ asunto: row }); closeModal(); start();
@@ -255,7 +250,7 @@
     openModal("<h3>" + (t.id ? "Editar tarea" : "Nueva tarea") + "</h3><form id=\"fT\"><label>Asunto<select name=\"asunto\">" + asuOpts(t.asunto) + "</select></label><label>Título<input name=\"titulo\" required value=\"" + (t.titulo || "") + "\"></label><label>Estado<select name=\"estado\">" + opts(EST_T, t.estado) + "</select></label><label>Orden<input name=\"orden\" type=\"number\" min=\"1\" value=\"" + (t.orden || 1) + "\"></label><label>Depende de<input name=\"depende_de\" value=\"" + (t.depende_de || "") + "\"></label><label>Comentarios<textarea name=\"comentarios\">" + (t.comentarios || "") + "</textarea></label><div class=\"rowbtns\"><button type=\"submit\">Guardar</button><button type=\"button\" data-close class=\"ghost\">Cancelar</button></div></form>");
     document.getElementById("fT").onsubmit = function (e) {
       e.preventDefault(); const fd = new FormData(e.target); const asunto = fd.get("asunto");
-      const row = { id: t.id || nextTarea(asunto), asunto: asunto, orden: Number(fd.get("orden") || 1), titulo: fd.get("titulo"), estado: fd.get("estado"), depende_de: fd.get("depende_de"), comentarios: fd.get("comentarios"), tablero: BOARDS.current };
+      const row = { id: t.id || nextTarea(asunto), asunto: asunto, orden: Number(fd.get("orden") || 1), titulo: fd.get("titulo"), estado: fd.get("estado"), depende_de: fd.get("depende_de"), comentarios: fd.get("comentarios"), tablero: BOARDS.current, usuario: CUR_USER };
       const i = DATA.tareas.findIndex(function (x) { return x.id === row.id; });
       if (i >= 0) DATA.tareas[i] = row; else DATA.tareas.push(row);
       persist({ tarea: row }); closeModal(); start();
@@ -288,6 +283,24 @@
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["const DATA = " + JSON.stringify(DATA) + ";\n"], { type: "text/javascript" }));
     a.download = "data.js"; a.click();
+  }
+  function formShare(a) {
+    var others = USERS.filter(function (x) { return String(x.usuario).toUpperCase() !== CUR_USER; });
+    var ts = (DATA.tareas || []).filter(function (t) { return t.asunto === a.id; }).sort(function (x, y) { return x.orden - y.orden; });
+    var optsU = others.map(function (x) { return "<option value=\"" + x.usuario + "\">" + x.usuario + "</option>"; }).join("");
+    var tasks = ts.map(function (t) {
+      return "<label class=\"chk\"><input type=\"checkbox\" name=\"tid\" value=\"" + t.id + "\" checked> " + t.id + " · " + t.titulo + "</label>";
+    }).join("") || "<p class=\"meta\">Sin tareas.</p>";
+    openModal("<h3>Compartir " + a.id + "</h3><form id=\"fS\"><label>Con usuario<select name=\"a_usuario\" required>" + optsU + "</select></label><label>Tablero destino<input name=\"tablero_destino\" value=\"cabeza\"></label><label class=\"chk\"><input type=\"checkbox\" name=\"todas\" checked> Todas las tareas</label><div id=\"shareTasks\">" + tasks + "</div><p class=\"meta\">Queda espejado: lo que edite uno se ve en el tablero del otro.</p><div class=\"rowbtns\"><button type=\"submit\">Compartir</button><button type=\"button\" data-close class=\"ghost\">Cancelar</button></div></form>");
+    document.getElementById("fS").onsubmit = function (e) {
+      e.preventDefault();
+      var fd = new FormData(e.target);
+      var todas = !!e.target.todas.checked;
+      var ids = [];
+      e.target.querySelectorAll("input[name=tid]:checked").forEach(function (c) { ids.push(c.value); });
+      persist({ share: { a_usuario: fd.get("a_usuario"), asunto_id: a.id, todas: todas, tareas: todas ? "*" : ids, tablero_origen: BOARDS.current, tablero_destino: fd.get("tablero_destino") || "cabeza" } });
+      closeModal();
+    };
   }
   function start() {
     const $ = function (id) { return document.getElementById(id); };
@@ -322,7 +335,7 @@
         const ts = tareasDe(a.id);
         const el = document.createElement("article");
         el.className = "asunto";
-        el.innerHTML = '<div class="asunto-head"><div class="row1"><div class="asunto-main"><span class="id">' + a.id + '</span><div class="cas">' + (a.casillero || "") + '</div><h2 class="title">' + a.asunto + '</h2><div class="meta">' + (a.dueno || "") + " · " + ts.length + " tarea" + (ts.length === 1 ? "" : "s") + " · " + (a.proximo || "") + '</div></div><div class="asunto-tools"><span class="badge">' + a.estado + '</span><button type="button" class="icon-btn edA" title="Editar asunto" aria-label="Editar asunto">✎</button><button type="button" class="icon-btn addT" title="Agregar tarea" aria-label="Agregar tarea">+</button></div></div></div><div class="tareas">' +
+        el.innerHTML = '<div class="asunto-head"><div class="row1"><div class="asunto-main"><span class="id">' + a.id + '</span><div class="cas">' + (a.casillero || "") + '</div><h2 class="title">' + a.asunto + '</h2><div class="meta">' + (a.dueno || "") + " · " + ts.length + " tarea" + (ts.length === 1 ? "" : "s") + " · " + (a.proximo || "") + '</div></div><div class="asunto-tools"><span class="badge">' + a.estado + '</span><button type="button" class="icon-btn edA" title="Editar asunto" aria-label="Editar asunto">✎</button><button type="button" class="icon-btn addT" title="Agregar tarea" aria-label="Agregar tarea">+</button><button type="button" class="icon-btn shA" title="Compartir asunto" aria-label="Compartir asunto">↗</button></div></div></div><div class="tareas">' +
           (ts.map(function (t) {
             return '<div class="tarea" data-tid="' + t.id + '"><div class="row1"><div class="tarea-main"><span class="tid">' + t.id + " · orden " + t.orden + '</span><div>' + t.titulo + "</div>" +
               (t.depende_de ? '<div class="cond">Depende de ' + t.depende_de + "</div>" : "") +
@@ -335,6 +348,8 @@
         });
         el.querySelector(".edA").addEventListener("click", function (e) { e.stopPropagation(); formAsunto(a); });
         el.querySelector(".addT").addEventListener("click", function (e) { e.stopPropagation(); formTarea({ asunto: a.id }); });
+        var sh = el.querySelector(".shA");
+        if (sh) sh.addEventListener("click", function (e) { e.stopPropagation(); formShare(a); });
         el.querySelectorAll(".edT").forEach(function (btn) {
           btn.addEventListener("click", function (e) {
             e.stopPropagation();
