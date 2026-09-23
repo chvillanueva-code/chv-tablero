@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="noindex,nofollow" />
   <title>CHV — Ingreso interno</title>
-  <link rel="stylesheet" href="styles.css?v=38" />
-  <link rel="stylesheet" href="logo.css?v=38" />
+  <link rel="stylesheet" href="styles.css?v=39" />
+  <link rel="stylesheet" href="logo.css?v=39" />
 </head>
 <body>
   <div id="gate" class="gate">
@@ -26,12 +26,13 @@
   </div>
   <div id="app" hidden>
     <header class="top">
-      <div class="brand">
-        <span class="logo-txt">CHV / Decisiones inmobiliarias</span>
+      <span class="logo-txt">CHV / Decisiones inmobiliarias</span>
+      <div class="hdr-center">
+        <span class="board-label">Tablero</span>
         <div class="titles-wrap">
           <button type="button" class="titles" id="boardBtn">
             <span class="titles-txt">
-              <span class="t-name" id="boardName">Tablero: CABEZA</span>
+              <span class="t-name" id="boardName">CABEZA</span>
               <span class="origen" id="origen">Asuntos y tareas — Escritorio y celular</span>
             </span>
             <span class="chev">▾</span>
@@ -40,7 +41,7 @@
         </div>
         <div class="board-btns">
           <button type="button" id="btnEditBoard" class="hdr-btn icon-btn" title="Editar tablero" aria-label="Editar tablero">✎</button>
-          <button type="button" id="btnNewBoard" class="hdr-btn" title="Crear tablero vacío">+ Tablero</button>
+          <button type="button" id="btnNewBoard" class="hdr-btn icon-btn" title="Crear tablero vacío" aria-label="Crear tablero">+</button>
         </div>
       </div>
       <div class="stats" id="stats"></div>
@@ -85,7 +86,7 @@
       });
     })();
   </script>
-  <script src="config.js?v=38"></script>
-  <script src="app.js?v=38"></script>
+  <script src="config.js?v=39"></script>
+  <script src="app.js?v=39"></script>
 </body>
 </html>
