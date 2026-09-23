@@ -144,6 +144,11 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
   padding: 0 !important;
   font-size: 1rem !important;
 }
+.hdr-center .hdr-btn,
+.hdr-center .icon-btn {
+  background: #fff !important;
+  color: #0b4f8a !important;
+}
 .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; justify-self: end; }
 .chip { background: rgba(255,255,255,.2); color: #fff; padding: 6px 10px; border-radius: 999px; font-size: .78rem; white-space: nowrap; }
 .filters {
