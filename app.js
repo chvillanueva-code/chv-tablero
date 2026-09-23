@@ -1,6 +1,7 @@
 (function () {
   const KEY = "chv_tablero_ok";
   const STORE = "chv_tablero_data";
+  const BSTORE = "chv_tableros";
   const USER = "chv";
   const PASS = "250578";
   const CFG = window.CHV_CONFIG || {};
@@ -12,17 +13,111 @@
   const err = document.getElementById("err");
   const modal = document.getElementById("modal");
   const sheet = document.getElementById("sheet");
+
+  function emptyData() { return { casilleros: [], asuntos: [], tareas: [] }; }
+  function defaultBoards() {
+    return {
+      current: "cabeza",
+      list: [
+        { id: "cabeza", nombre: "CABEZA", descripcion: "Asuntos y tareas — Escritorio y celular" },
+        { id: "hogar", nombre: "HOGAR", descripcion: "Home Sweet Home" }
+      ],
+      data: { hogar: emptyData() }
+    };
+  }
+  let BOARDS = defaultBoards();
+  try {
+    const savedB = JSON.parse(localStorage.getItem(BSTORE) || "");
+    if (savedB && savedB.list) {
+      BOARDS = savedB;
+      if (!BOARDS.list.some(function (b) { return b.id === "hogar"; })) {
+        BOARDS.list.push({ id: "hogar", nombre: "HOGAR", descripcion: "Home Sweet Home" });
+      }
+      BOARDS.data = BOARDS.data || {};
+      if (!BOARDS.data.hogar) BOARDS.data.hogar = emptyData();
+    }
+  } catch (e) {}
+
+  function board() {
+    return BOARDS.list.filter(function (b) { return b.id === BOARDS.current; })[0] || BOARDS.list[0];
+  }
+  function saveBoards() {
+    try {
+      if (BOARDS.current !== "cabeza") BOARDS.data[BOARDS.current] = DATA;
+      else BOARDS.data.cabeza = DATA;
+      localStorage.setItem(BSTORE, JSON.stringify(BOARDS));
+    } catch (e) {}
+  }
+  function paintBoard() {
+    const b = board();
+    const h = document.getElementById("boardName");
+    const d = document.getElementById("origen");
+    if (h) h.textContent = "Tablero: " + b.nombre;
+    if (d) d.textContent = b.descripcion;
+    document.title = "CHV — Tablero: " + b.nombre;
+    const pick = document.getElementById("boardPick");
+    if (pick) {
+      pick.innerHTML = BOARDS.list.map(function (x) {
+        return "<option value=\"" + x.id + "\"" + (x.id === BOARDS.current ? " selected" : "") + ">" + x.nombre + "</option>";
+      }).join("");
+    }
+  }
+  function switchBoard(id) {
+    saveBoards();
+    BOARDS.current = id;
+    if (id === "cabeza") {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORE) || "");
+        window.DATA = (saved && saved.asuntos) ? saved : (BOARDS.data.cabeza || emptyData());
+      } catch (e) { window.DATA = BOARDS.data.cabeza || emptyData(); }
+    } else {
+      window.DATA = BOARDS.data[id] || emptyData();
+    }
+    saveBoards();
+    paintBoard();
+    start();
+  }
+  function formBoard(isNew) {
+    const b = isNew ? { nombre: "", descripcion: "" } : board();
+    openModal("<h3>" + (isNew ? "Nuevo tablero" : "Editar tablero") + "</h3><form id=\"fB\"><label>Nombre<input name=\"nombre\" required value=\"" + (b.nombre || "") + "\" placeholder=\"Ej. HOGAR\"></label><label>Descripción<input name=\"descripcion\" value=\"" + (b.descripcion || "") + "\" placeholder=\"Home Sweet Home\"></label><div class=\"rowbtns\"><button type=\"submit\">Guardar</button><button type=\"button\" data-close class=\"ghost\">Cancelar</button></div></form>");
+    document.getElementById("fB").onsubmit = function (e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const nombre = String(fd.get("nombre") || "").trim();
+      const descripcion = String(fd.get("descripcion") || "").trim();
+      if (!nombre) return;
+      if (isNew) {
+        const id = nombre.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || ("t" + Date.now());
+        const nid = BOARDS.list.some(function (x) { return x.id === id; }) ? id + "-" + Date.now() : id;
+        BOARDS.list.push({ id: nid, nombre: nombre, descripcion: descripcion });
+        BOARDS.data[nid] = emptyData();
+        closeModal();
+        switchBoard(nid);
+      } else {
+        const cur = board();
+        cur.nombre = nombre;
+        cur.descripcion = descripcion;
+        saveBoards();
+        paintBoard();
+        closeModal();
+      }
+    };
+  }
+
   function sheetsUrl() { return String(CFG.WEBAPP_URL || "").trim(); }
   function setOrigen(t) {
     const el = document.getElementById("origen");
     if (el) el.title = t || "";
   }
   function persistLocal() {
-    try { localStorage.setItem(STORE, JSON.stringify(DATA)); } catch (e) {}
+    try {
+      if (BOARDS.current === "cabeza") localStorage.setItem(STORE, JSON.stringify(DATA));
+      saveBoards();
+    } catch (e) {}
   }
   function persist(extra) {
     persistLocal();
-    if (!sheetsUrl()) return;
+    if (BOARDS.current !== "cabeza" || !sheetsUrl()) return;
     fetch(sheetsUrl(), {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -32,7 +127,7 @@
   }
   function pullSheets() {
     const url = sheetsUrl();
-    if (!url) return Promise.resolve(false);
+    if (!url || BOARDS.current !== "cabeza") return Promise.resolve(false);
     setOrigen("Leyendo Google Sheets…");
     return fetch(url + "?token=" + encodeURIComponent(CFG.TOKEN || PASS))
       .then(function (r) { return r.json(); })
@@ -86,8 +181,19 @@
       const saved = JSON.parse(localStorage.getItem(STORE) || "");
       if (saved && saved.asuntos) window.DATA = saved;
     } catch (e) {}
-    if (!window.DATA) window.DATA = { casilleros: [], asuntos: [], tareas: [] };
-    pullSheets().then(function () { start(); });
+    if (!window.DATA) window.DATA = emptyData();
+    if (BOARDS.current !== "cabeza") window.DATA = BOARDS.data[BOARDS.current] || emptyData();
+    paintBoard();
+    const go = function () { paintBoard(); start(); bindBoardUi(); };
+    if (BOARDS.current === "cabeza") pullSheets().then(go); else go();
+  }
+  function bindBoardUi() {
+    const ed = document.getElementById("btnEditBoard");
+    const nw = document.getElementById("btnNewBoard");
+    const pk = document.getElementById("boardPick");
+    if (ed) ed.onclick = function () { formBoard(false); };
+    if (nw) nw.onclick = function () { formBoard(true); };
+    if (pk) pk.onchange = function () { switchBoard(pk.value); };
   }
   function nextAsunto() {
     const n = DATA.asuntos.reduce(function (m, a) {
@@ -186,7 +292,7 @@
   function start() {
     const $ = function (id) { return document.getElementById(id); };
     const list = $("list"), q = $("q"), cas = $("casillero"), est = $("estado");
-    if (!DATA || !DATA.asuntos) window.DATA = { casilleros: [], asuntos: [], tareas: [] };
+    if (!DATA || !DATA.asuntos) window.DATA = emptyData();
     const keepC = cas.value, keepE = est.value, keepQ = q.value;
     cas.innerHTML = '<option value="">Todos los casilleros</option>' + casOpts("");
     est.innerHTML = '<option value="">Todos los estados</option>' + opts([...new Set(DATA.asuntos.map(function (a) { return a.estado; }))].sort(), "");
@@ -211,6 +317,10 @@
         '<span class="chip">' + abiertos + " abiertos</span>" +
         '<span class="chip">' + pendT + " tareas pendientes</span>";
       list.innerHTML = "";
+      if (!items.length) {
+        list.innerHTML = '<p class="meta">Este tablero está vacío. Sumá un asunto para empezar.</p>';
+        return;
+      }
       items.forEach(function (a) {
         const ts = tareasDe(a.id);
         const el = document.createElement("article");
