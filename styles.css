@@ -32,21 +32,20 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
 }
 .err { color: #9b1c1c; }
 .top {
-  background: #fff;
-  color: #000;
-  padding: 10px 16px;
+  background: linear-gradient(90deg, #1a8ad4 0%, #1a8ad4 42%, #0b4f8a 58%, #0b4f8a 100%);
+  color: #fff;
+  padding: 8px 12px;
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--line);
 }
 .brand {
   display: flex;
   flex-wrap: nowrap;
-  gap: 12px;
-  align-items: baseline;
+  gap: 10px;
+  align-items: center;
   min-width: 0;
 }
 .logo-txt {
@@ -54,14 +53,17 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
   letter-spacing: .03em;
   font-size: .95rem;
   white-space: nowrap;
-  color: #0b4f8a;
+  color: #fff;
 }
-.sep {
-  width: 1px;
-  height: 18px;
-  background: #c5ced6;
-  flex: 0 0 1px;
-  align-self: center;
+.titles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  background: #fff;
+  color: #000;
+  border-radius: 8px;
+  padding: 6px 12px;
 }
 .top h1 {
   margin: 0;
@@ -77,7 +79,7 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
   white-space: nowrap;
 }
 .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.chip { background: #e8eef4; color: #000; padding: 6px 10px; border-radius: 999px; font-size: .78rem; white-space: nowrap; }
+.chip { background: rgba(255,255,255,.2); color: #fff; padding: 6px 10px; border-radius: 999px; font-size: .78rem; white-space: nowrap; }
 .filters {
   display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px 16px;
   background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5;
