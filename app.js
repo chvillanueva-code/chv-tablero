@@ -197,12 +197,18 @@
     sessionStorage.removeItem(KEY);
     location.reload();
   });
+  function boardPrefix() {
+    const raw = String((board() && board().nombre) || BOARDS.current || "TAB");
+    const letters = raw.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    return (letters + "XXX").slice(0, 3);
+  }
   function nextAsunto() {
+    const p = boardPrefix();
     const n = (DATA.asuntos || []).reduce(function (m, a) {
-      const x = parseInt(String(a.id).replace("CHV-", ""), 10);
+      const x = parseInt(String(a.id || "").replace(/^([A-Z0-9]{3}|CHV)-/, ""), 10);
       return isNaN(x) ? m : Math.max(m, x);
     }, 0);
-    return "CHV-" + String(n + 1).padStart(3, "0");
+    return p + "-" + String(n + 1).padStart(3, "0");
   }
   function nextTarea(aid) {
     const n = (DATA.tareas || []).filter(function (t) { return t.asunto === aid; }).reduce(function (m, t) {
