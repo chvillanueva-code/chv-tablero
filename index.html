@@ -10,11 +10,11 @@
 <body>
   <div id="gate" class="gate">
     <form id="login" class="login" autocomplete="on">
-      <div class="chv-mini">CHV / Decisiones inmobiliarias</div>
+      <div class="login-logo" role="img" aria-label="CHV / Decisiones inmobiliarias"></div>
       <h1>Tablero: CABEZA</h1>
-      <p>Ingreso interno</p>
+      <p>Ingreso interno · usuario CHV</p>
       <label>Usuario
-        <input id="user" name="username" type="text" required autocomplete="username" />
+        <input id="user" name="username" type="text" required autocomplete="username" placeholder="CHV" />
       </label>
       <label>Clave
         <input id="pass" name="password" type="password" required autocomplete="current-password" />
@@ -25,10 +25,7 @@
   </div>
 
   <div id="app" hidden>
-    <div class="chv-banner">
-      <div class="chv-banner-l"><span class="chv-word">CHV</span><span class="slash">/</span><span>Decisiones<br>inmobiliarias</span></div>
-      <div class="chv-banner-r">25 de Mayo 78, Avellaneda<br>www.chv.ar · contacto@chv.ar<br>11 6719 9866 · 11 4201 3150</div>
-    </div>
+    <div class="chv-banner" role="img" aria-label="CHV / Decisiones inmobiliarias"></div>
     <header class="top">
       <div class="brand">
         <div>
