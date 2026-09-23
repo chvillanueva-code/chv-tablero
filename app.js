@@ -324,10 +324,10 @@
         el.className = "asunto";
         el.innerHTML = '<div class="asunto-head"><div class="row1"><div class="asunto-main"><span class="id">' + a.id + '</span><div class="cas">' + (a.casillero || "") + '</div><h2 class="title">' + a.asunto + '</h2><div class="meta">' + (a.dueno || "") + " · " + ts.length + " tarea" + (ts.length === 1 ? "" : "s") + " · " + (a.proximo || "") + '</div></div><div class="asunto-tools"><span class="badge">' + a.estado + '</span><button type="button" class="icon-btn edA" title="Editar asunto" aria-label="Editar asunto">✎</button><button type="button" class="icon-btn addT" title="Agregar tarea" aria-label="Agregar tarea">+</button></div></div></div><div class="tareas">' +
           (ts.map(function (t) {
-            return '<div class="tarea" data-tid="' + t.id + '"><div class="row1"><span class="tid">' + t.id + " · orden " + t.orden + '</span><div class="tarea-tools"><span class="badge">' + t.estado + '</span><button type="button" class="icon-btn edT" title="Editar tarea" aria-label="Editar tarea">✎</button></div></div><div>' + t.titulo + "</div>" +
+            return '<div class="tarea" data-tid="' + t.id + '"><div class="row1"><div class="tarea-main"><span class="tid">' + t.id + " · orden " + t.orden + '</span><div>' + t.titulo + "</div>" +
               (t.depende_de ? '<div class="cond">Depende de ' + t.depende_de + "</div>" : "") +
               (t.comentarios ? '<div class="cond">' + t.comentarios + "</div>" : "") +
-              "</div>";
+              '</div><div class="tarea-tools"><span class="badge">' + t.estado + '</span><button type="button" class="icon-btn edT" title="Editar tarea" aria-label="Editar tarea">✎</button></div></div></div>';
           }).join("") || '<div class="tarea">Sin tareas.</div>') + "</div>";
         el.querySelector(".asunto-head").addEventListener("click", function (e) {
           if (e.target.closest(".icon-btn")) return;
