@@ -1,0 +1,29 @@
+.chv-banner {
+  display: block !important;
+  min-height: 72px;
+  background: linear-gradient(90deg, #1a8ad4 0%, #1a8ad4 48%, #0b4f8a 52%, #0b4f8a 100%);
+  position: relative;
+}
+.chv-banner::after {
+  content: "CHV  /  Decisiones inmobiliarias";
+  display: block;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .04em;
+  padding: 18px 16px;
+  font-size: 1.15rem;
+}
+.chv-banner-l, .chv-banner-r { display: none !important; }
+.login-logo {
+  min-height: 56px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #1a8ad4 0%, #1a8ad4 48%, #0b4f8a 52%, #0b4f8a 100%);
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  padding: 14px 12px;
+  letter-spacing: .04em;
+}
+.login-logo::after { content: "CHV  /  Decisiones inmobiliarias"; }
