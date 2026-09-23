@@ -32,20 +32,21 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
 }
 .err { color: #9b1c1c; }
 .top {
-  background: linear-gradient(90deg, #1a8ad4 0%, #1a8ad4 42%, #0b4f8a 58%, #0b4f8a 100%);
-  color: #fff;
+  background: #fff;
+  color: #000;
   padding: 10px 16px;
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid var(--line);
 }
 .brand {
   display: flex;
   flex-wrap: nowrap;
   gap: 12px;
-  align-items: center;
+  align-items: baseline;
   min-width: 0;
 }
 .logo-txt {
@@ -53,29 +54,30 @@ html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; b
   letter-spacing: .03em;
   font-size: .95rem;
   white-space: nowrap;
+  color: #0b4f8a;
 }
 .sep {
   width: 1px;
-  height: 22px;
-  background: rgba(255,255,255,.45);
+  height: 18px;
+  background: #c5ced6;
   flex: 0 0 1px;
+  align-self: center;
 }
 .top h1 {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
   white-space: nowrap;
+  color: #000;
 }
 .origen {
   margin: 0;
-  padding: 6px 16px;
-  font-size: .78rem;
-  color: var(--muted);
-  background: #fff;
-  border-bottom: 1px solid var(--line);
+  font-size: .9rem;
+  color: #000;
+  white-space: nowrap;
 }
 .stats { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-.chip { background: rgba(255,255,255,.18); padding: 6px 10px; border-radius: 999px; font-size: .78rem; white-space: nowrap; }
+.chip { background: #e8eef4; color: #000; padding: 6px 10px; border-radius: 999px; font-size: .78rem; white-space: nowrap; }
 .filters {
   display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px 16px;
   background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5;
@@ -127,13 +129,15 @@ button.ghost { background: #fff; color: var(--blue); border: 1px solid var(--lin
 .casrow { display: grid; grid-template-columns: 1fr 70px auto; gap: 8px; align-items: center; }
 .chk { display: flex; align-items: center; gap: 6px; font-size: .8rem; }
 @media (min-width: 720px) {
-  .filters, .actions, .list, .foot, .origen { max-width: 980px; margin-left: auto; margin-right: auto; width: 100%; }
+  .filters, .actions, .list, .foot { max-width: 980px; margin-left: auto; margin-right: auto; width: 100%; }
   .filters { grid-template-columns: 2fr 1fr 1fr; }
   .modal { align-items: center; }
   .sheet { border-radius: 16px; }
 }
 @media (max-width: 720px) {
   .top { flex-wrap: wrap; }
+  .brand { flex-wrap: wrap; }
   .logo-txt { font-size: .8rem; }
+  .origen { white-space: normal; }
   .stats { width: 100%; justify-content: flex-start; }
 }
